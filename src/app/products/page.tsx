@@ -8,10 +8,10 @@ import { productsData } from './products';
 
 export default function ProductsPage() {
   const [filteredProducts, setFilteredProducts] = useState(productsData);
-  const [price, setPrice] = useState(200);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
-  const [selectedPromotion, setSelectedPromotion] = useState<string | null>(null);
+  const [price, ] = useState(200);
+  const [selectedCategories, ] = useState<string[]>([]);
+  const [selectedGenders, ] = useState<string[]>([]);
+  const [selectedPromotion, ] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState('');
 
   const filterProducts = useCallback(() => {
