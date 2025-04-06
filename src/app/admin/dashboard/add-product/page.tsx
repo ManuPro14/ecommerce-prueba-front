@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image';
 import React, { useState } from 'react';
 
 export default function AddProductPage() {
@@ -47,7 +48,7 @@ export default function AddProductPage() {
         {/* Previsualización de la imagen */}
         {imageUrl && (
           <div className="flex justify-center mt-4">
-            <img
+            <Image
               src={imageUrl}
               alt="Product Preview"
               className="w-64 h-64 object-cover rounded-lg border-2 border-purple-500"

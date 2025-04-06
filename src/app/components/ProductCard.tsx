@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image';
 import React from 'react';
 
 interface Product {
@@ -18,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition flex flex-col justify-between max-h-screen-md">
-      <img
+      <Image
         src={product.image}
         alt={product.name}
         className="w-full h-40 object-cover"

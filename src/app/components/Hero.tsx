@@ -9,6 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import Image from 'next/image';
 
 const images = [
   '/img/heroimg1.png', 
@@ -34,7 +35,7 @@ function Hero() {
           {images.map((img, index) => (
             <CarouselItem key={index} className="w-full h-full">
               <div className="relative w-full h-full">
-                <img
+                <Image
                   src={img}
                   alt={`Slide ${index}`}
                   className="w-full h-full object-cover"
