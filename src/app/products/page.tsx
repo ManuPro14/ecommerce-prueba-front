@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import ProductCard from '@/app/components/ProductCard';
-import { productsData } from './products'
+import { productsData } from './products';
 
 export default function ProductsPage() {
   const [products] = useState(productsData);
@@ -15,11 +15,7 @@ export default function ProductsPage() {
   const [selectedPromotion, setSelectedPromotion] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState('');
 
-  useEffect(() => {
-    filterProducts();
-  }, [price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
-
-  const filterProducts = () => {
+  const filterProducts = useCallback(() => {
     let result = [...products];
 
     result = result.filter(p => p.price <= price);
@@ -49,28 +45,17 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(result);
-  };
+  }, [products, price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
 
-  const handleCheckboxChange = (value: string, type: string) => {
-    if (type === 'category') {
-      setSelectedCategories(prev =>
-        prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-      );
-    }
-    if (type === 'gender') {
-      setSelectedGenders(prev =>
-        prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-      );
-    }
-  };
+  useEffect(() => {
+    filterProducts();
+  }, [filterProducts]);
 
-  const handlePromotionChange = (value: string) => {
-    setSelectedPromotion(value === selectedPromotion ? null : value);
-  };
+  
 
   return (
     <section className="w-full">
-      {/* Header - ahora stackeado en mobile */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 max-w-7xl mx-auto my-8">
         <h1 className="text-4xl md:text-5xl font-bold text-purple-700 text-center md:text-start">
           Our Products
