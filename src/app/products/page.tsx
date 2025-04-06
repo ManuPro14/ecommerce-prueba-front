@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -10,7 +7,6 @@ import ProductCard from '@/app/components/ProductCard';
 import { productsData } from './products';
 
 export default function ProductsPage() {
-  const [products] = useState(productsData);
   const [filteredProducts, setFilteredProducts] = useState(productsData);
   const [price, setPrice] = useState(200);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -19,7 +15,7 @@ export default function ProductsPage() {
   const [sortOption, setSortOption] = useState('');
 
   const filterProducts = useCallback(() => {
-    let result = [...products];
+    let result = [...productsData];
 
     result = result.filter(p => p.price <= price);
 
@@ -48,13 +44,11 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(result);
-  }, [products, price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
+  }, [price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
 
   useEffect(() => {
     filterProducts();
   }, [filterProducts]);
-
-  
 
   return (
     <section className="w-full">

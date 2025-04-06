@@ -23,6 +23,8 @@ export default function ProductCard({ product }: { product: Product }) {
         src={product.image}
         alt={product.name}
         className="w-full h-40 object-cover"
+        width={400}
+        height={400}
       />
 
       <div className="flex flex-col flex-1 justify-between p-6 text-center items-center">
