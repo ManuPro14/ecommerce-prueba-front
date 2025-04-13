@@ -12,7 +12,7 @@ const featuredProducts = [
 
 export default function FeaturedProducts() {
   return (
-    <section className="max-w-7xl mx-auto py-16 px-4 bg-gray-300">
+    <section className="max-w-7xl mx-auto py-8 px-4 bg-gray-300/60 rounded-xl shadow-lg">
       <h2 className="text-4xl font-bold text-center text-purple-700 mb-12">Featured Sneakers</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {featuredProducts.map((product) => (
