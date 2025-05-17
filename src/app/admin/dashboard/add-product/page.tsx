@@ -1,20 +1,56 @@
 'use client'
 
-import Image from 'next/image';
 import React, { useState } from 'react';
 
 export default function AddProductPage() {
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [sku, setSku] = useState('');
+  const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [category, setCategory] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('New product:', { name, price, imageUrl });
-    alert('Product added successfully (simulated)');
-    setName('');
-    setPrice('');
-    setImageUrl('');
+    
+    const product = {
+      name,
+      description,
+      sku,
+      quantity,
+      price,
+      image: imageUrl,
+      category,
+    }
+
+    try {
+      const res = await fetch (process.env.NEXT_PUBLIC_BACKEND_URL + '/products' || 'http://localhost:3000/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(product),
+      });
+
+      if (res.ok) {
+        alert('Product added successfully');
+        setName('');
+        setDescription('');
+        setSku('');
+        setQuantity('');
+        setPrice('');
+        setImageUrl('');
+        setCategory('');
+      } else {
+        const errorData = await res.json();
+        alert(`Error adding product: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Error adding product');
+    }
   };
 
   return (
@@ -30,6 +66,30 @@ export default function AddProductPage() {
           required
         />
         <input
+          type="text"
+          placeholder="Description"
+          className="p-2 rounded bg-gray-700 text-white"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="SKU"
+          className="p-2 rounded bg-gray-700 text-white"
+          value={sku}
+          onChange={(e) => setSku(e.target.value)}
+          required
+        />
+        <input
+          type="number"
+          placeholder="Quantity"
+          className="p-2 rounded bg-gray-700 text-white"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          required
+        />
+        <input
           type="number"
           placeholder="Price"
           className="p-2 rounded bg-gray-700 text-white"
@@ -39,18 +99,29 @@ export default function AddProductPage() {
         />
         <input
           type="text"
+          placeholder="Category"
+          className="p-2 rounded bg-gray-700 text-white"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        />
+        <input
+          type="text"
           placeholder="Image URL"
           className="p-2 rounded bg-gray-700 text-white"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
+          required
         />
 
         {/* Previsualización de la imagen */}
         {imageUrl && (
           <div className="flex justify-center mt-4">
-            <Image
+            <img
               src={imageUrl}
               alt="Product Preview"
+              width={256}
+              height={256}
               className="w-64 h-64 object-cover rounded-lg border-2 border-purple-500"
             />
           </div>

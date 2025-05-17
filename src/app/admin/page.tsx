@@ -5,18 +5,36 @@ import { useRouter } from 'next/navigation';
 
 function AdminLogin() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (username === 'admin' && password === 'admin123') {
-      localStorage.setItem('isAdmin', 'true');
-      router.push('/admin/dashboard');
-    } else {
-      setError('Invalid username or password');
+    try {
+      const res = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.access_token) {
+        localStorage.setItem('isAdmin', 'true');
+        localStorage.setItem('token', data.access_token);
+        router.push('/admin/dashboard');
+      } else {
+        setError(data.message || 'Invalid credentials');
+      }
+    } catch (err) {
+      setError('Error connecting to server');
     }
   };
 
@@ -29,11 +47,11 @@ function AdminLogin() {
         <h1 className="text-3xl text-purple-500 font-bold text-center">Admin Login</h1>
 
         <input
-          type="text"
-          placeholder="Username"
+          type="email"
+          placeholder="Email"
           className="p-2 rounded bg-gray-700 text-white"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
@@ -57,4 +75,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default AdminLogin
