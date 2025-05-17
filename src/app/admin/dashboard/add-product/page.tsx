@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
+import ModalMessage from '../../../components/ModalMessage';
 
 export default function AddProductPage() {
   const [name, setName] = useState('');
@@ -10,10 +11,11 @@ export default function AddProductPage() {
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const product = {
       name,
       description,
@@ -22,10 +24,10 @@ export default function AddProductPage() {
       price,
       image: imageUrl,
       category,
-    }
+    };
 
     try {
-      const res = await fetch (process.env.NEXT_PUBLIC_BACKEND_URL + '/products' || 'http://localhost:3000/products', {
+      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + '/products' || 'http://localhost:3000/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +37,7 @@ export default function AddProductPage() {
       });
 
       if (res.ok) {
-        alert('Product added successfully');
+        setShowModal(true);
         setName('');
         setDescription('');
         setSku('');
@@ -114,7 +116,6 @@ export default function AddProductPage() {
           required
         />
 
-        {/* Previsualización de la imagen */}
         {imageUrl && (
           <div className="flex justify-center mt-4">
             <img
@@ -134,6 +135,16 @@ export default function AddProductPage() {
           Add Product
         </button>
       </form>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-400/70 flex items-center justify-center z-50">
+          <ModalMessage
+            title="Producto creado"
+            text="El producto se ha creado correctamente."
+            onClose={() => setShowModal(false)}
+          />
+        </div>
+      )} 
     </div>
   );
 }
