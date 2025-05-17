@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -12,14 +12,42 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const initialProducts = [
-  { id: 1, name: 'Running Sneakers', price: 89.99, units: 25, discount: 0 },
-  { id: 2, name: 'Stylish Sneakers', price: 79.99, units: 18, discount: 0 },
-  { id: 3, name: 'Sport Sneakers', price: 99.99, units: 40, discount: 0 },
-];
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  discount: number;
+}
 
 export default function InventoryPage() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + '/products' || 'http://localhost:3000/products', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        } else {
+          console.error('Failed to fetch products');
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  
 
   const handleUnitsChange = (id: number, newUnits: number) => {
     setProducts((prev) =>
@@ -33,15 +61,14 @@ export default function InventoryPage() {
     );
   };
 
-  const totalUnits = products.reduce((acc, p) => acc + p.units, 0);
-  const totalRevenue = products.reduce((acc, p) => acc + (p.price * (1 - p.discount / 100)) * p.units, 0);
+  const totalUnits = products.reduce((acc, p) => acc + p.quantity, 0);
+  const totalRevenue = products.reduce((acc, p) => acc + p.price * p.quantity, 0);
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen w-full bg-gray-400 text-white p-8">
       <h1 className="text-3xl text-purple-700 font-bold mb-8">Product Inventory</h1>
 
       <Table className="w-full max-w-7xl bg-gray-800 rounded-lg overflow-hidden">
-        <TableCaption className="text-gray-300">Manage your products easily.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="text-purple-500">Product Name</TableHead>
@@ -55,17 +82,18 @@ export default function InventoryPage() {
 
         <TableBody>
           {products.map((product) => {
-            const discountedPrice = product.price * (1 - product.discount / 100);
+            const unitPrice = product.price;
+            const totalValue = unitPrice * product.quantity;
             return (
               <TableRow key={product.id}>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>${unitPrice.toFixed(2)}</TableCell>
 
                 <TableCell>
                   <input
                     type="number"
                     min="0"
-                    value={product.units}
+                    value={product.quantity}
                     onChange={(e) => handleUnitsChange(product.id, parseInt(e.target.value))}
                     className="w-20 p-1 bg-gray-700 rounded text-center"
                   />
@@ -83,11 +111,11 @@ export default function InventoryPage() {
                 </TableCell>
 
                 <TableCell>
-                  ${discountedPrice.toFixed(2)}
+                  ${unitPrice.toFixed(2)}
                 </TableCell>
 
                 <TableCell className="text-right">
-                  ${(discountedPrice * product.units).toFixed(2)}
+                  ${totalValue.toFixed(2)}
                 </TableCell>
               </TableRow>
             );
