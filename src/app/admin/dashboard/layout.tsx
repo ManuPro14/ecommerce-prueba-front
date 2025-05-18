@@ -30,10 +30,6 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             <CirclePlus className="inline-block mr-2" />
             Add Product
           </Link>
-          <Link href="/admin/dashboard/reports" className="text-gray-300 hover:text-purple-400">
-            <ClipboardMinus className="inline-block mr-2" />
-            Reports
-          </Link>
         </nav>
 
         {/* Logout Button */}
