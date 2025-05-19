@@ -4,18 +4,53 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import ProductCard from '@/app/components/ProductCard';
-import { productsData } from './products';
+
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  gender: string;
+  promotion: boolean;
+  createdAt: string;
+}
 
 export default function ProductsPage() {
-  const [filteredProducts, setFilteredProducts] = useState(productsData);
-  const [price, ] = useState(200);
-  const [selectedCategories, ] = useState<string[]>([]);
-  const [selectedGenders, ] = useState<string[]>([]);
-  const [selectedPromotion, ] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [price] = useState(200);
+  const [selectedCategories] = useState<string[]>([]);
+  const [selectedGenders] = useState<string[]>([]);
+  const [selectedPromotion] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/public`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('Formato de respuesta inválido');
+        
+        setProducts(data);
+        setError('');
+      } catch (error: any) {
+        setError(error.message || 'An unknown error occurred');
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filterProducts = useCallback(() => {
-    let result = [...productsData];
+    let result = [...products];
 
     result = result.filter(p => p.price <= price);
 
@@ -24,13 +59,13 @@ export default function ProductsPage() {
     }
 
     if (selectedGenders.length > 0) {
-      result = result.filter(p => selectedGenders.includes(p.gender));
+      result = result.filter(p => selectedGenders.includes(p.gender ?? ''));
     }
 
     if (selectedPromotion === 'Promotion') {
-      result = result.filter(p => p.promotion);
+      result = result.filter(p => p.promotion === true);
     } else if (selectedPromotion === 'No Promotion') {
-      result = result.filter(p => !p.promotion);
+      result = result.filter(p => p.promotion === false);
     }
 
     if (sortOption === 'price-high') {
@@ -44,20 +79,18 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(result);
-  }, [price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
+  }, [products, price, selectedCategories, selectedGenders, selectedPromotion, sortOption]);
 
   useEffect(() => {
     filterProducts();
-  }, [filterProducts]);
+  }, [products, filterProducts]);
 
   return (
     <section className="w-full">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 max-w-7xl mx-auto my-8">
         <h1 className="text-4xl md:text-5xl font-bold text-purple-700 text-center md:text-start">
           Our Products
         </h1>
-
         <Link
           href="/cart"
           className="bg-purple-700 hover:bg-purple-600 text-white py-2 px-6 rounded-full font-semibold flex gap-2 items-center justify-center md:justify-start"
@@ -67,7 +100,6 @@ export default function ProductsPage() {
         </Link>
       </div>
 
-      {/* Ordenamiento */}
       <div className="flex justify-end max-w-7xl mx-auto mb-6 px-4 md:px-0">
         <select
           value={sortOption}
@@ -82,12 +114,13 @@ export default function ProductsPage() {
         </select>
       </div>
 
-      {/* Productos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 md:px-0">
+      { products.length > 0 && (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 md:px-0 bg-red-500">
         {filteredProducts.map(product => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product._id} product={{...product, _id: product._id}} />
         ))}
       </div>
+      )}
     </section>
   );
 }

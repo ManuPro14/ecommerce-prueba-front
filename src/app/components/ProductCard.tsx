@@ -4,13 +4,13 @@ import Image from 'next/image';
 import React from 'react';
 
 interface Product {
-  id: number;
+  _id: string;
   name: string;
   price: number;
   image: string;
   category: string;
-  gender: string;
-  promotion: boolean;
+  gender?: string;
+  promotion?: boolean;
   createdAt: string;
 }
 
@@ -20,11 +20,16 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition flex flex-col justify-between max-h-screen-md">
       <Image
-        src={product.image}
+        src={product.image || '/placeholder-product.jpg'}
         alt={product.name}
-        className="w-full h-40 object-cover"
         width={400}
         height={400}
+        className="w-full h-48 object-contain bg-gray-700"
+        placeholder="blur"
+        blurDataURL="/placeholder-blur.jpg"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
+        }}
       />
 
       <div className="flex flex-col flex-1 justify-between p-6 text-center items-center">

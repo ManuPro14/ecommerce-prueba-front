@@ -9,8 +9,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdmin'); // elimina sesión
-    router.push('/'); // redirige al home
+    localStorage.removeItem('isAdmin');
+    router.push('/');
   };
 
   return (
